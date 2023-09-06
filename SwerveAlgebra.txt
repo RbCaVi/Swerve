@@ -1,99 +1,160 @@
+// xn and yn are the x and y positions of the wheels relative to the robot's center
+// +x is right
+// +y is forward
+// each wheel has an x and y velocity (xvn and yvn)
+// the velocities are combined into a (number of wheels*2)-dimensional space
+// a point in this space is (xv1,yv1,xv2,yv2,...)
+// dist^2 is a function of xv, yv and spin
+
+// these are the target wheel velocities for a value of xv, yv, and spin
+xvn=xv+yn*spin
+yvn=yv-xn*spin
+
+// sum(n=1->w,) means sum over all wheels
+
+// this is the distance from the point in the velocity space for a value of xv, yv, and spin
+dist^2=sum(n=1->w,(xv+yn*spin-xvn)^2+(yv-xn*spin-yvn)^2)
+
+// the calculated control values (xv, yv, and spin) are the ones where the distance is minimum
+
+// expand all parentheses
 dist^2=sum(n=1->w,(xv+yn*spin-xvn)^2+(yv-xn*spin-yvn)^2)
 dist^2=sum(n=1->w,(xv+yn*spin-xvn)*(xv+yn*spin-xvn)+(yv-xn*spin-yvn)*(yv-xn*spin-yvn))
-dist^2=sum(n=1->w,xv*(xv+yn*spin-xvn)+yn*spin*(xv+yn*spin-xvn)-xvn*(xv+yn*spin-xvn)+yv*(yv-xn*spin-yvn)-xn*spin*(yv-xn*spin-yvn)-yvn*(yv-xn*spin-yvn))
-dist^2=sum(n=1->w,xv*xv+xv*yn*spin-xv*xvn+yn*spin*xv+yn*spin*yn*spin-yn*spin*xvn-xvn*xv-xvn*yn*spin+xvn*xvn+yv*yv-yv*xn*spin-yv*yvn-xn*spin*yv+xn*spin*xn*spin+xn*spin*yvn-yvn*yv+yvn*xn*spin+yvn*yvn)
 dist^2=sum(n=1->w,
-+xv*xv
-+yv*yv
--xv*xvn*2
--yv*yvn*2
-+xvn*xvn
-+yvn*yvn
-+yn*xv*spin*2
--yv*xn*spin*2
-+xn*xn*spin*spin
-+yn*yn*spin*spin
-+xn*spin*yvn*2
--yn*spin*xvn*2
+  +(xv+yn*spin-xvn)*(xv+yn*spin-xvn)
+  +(yv-xn*spin-yvn)*(yv-xn*spin-yvn)
+)
+dist^2=sum(n=1->w,
+  +xv*(xv+yn*spin-xvn)+yn*spin*(xv+yn*spin-xvn)-xvn*(xv+yn*spin-xvn)
+  +yv*(yv-xn*spin-yvn)-xn*spin*(yv-xn*spin-yvn)-yvn*(yv-xn*spin-yvn)
+)
+dist^2=sum(n=1->w,
+  +xv*(xv+yn*spin-xvn)
+  +yv*(yv-xn*spin-yvn)
+  +yn*spin*(xv+yn*spin-xvn)
+  -xn*spin*(yv-xn*spin-yvn)
+  -xvn*(xv+yn*spin-xvn)
+  -yvn*(yv-xn*spin-yvn)
+)
+// flip signs
+dist^2=sum(n=1->w,
+  +xv*(xv+yn*spin-xvn)
+  +yv*(yv-xn*spin-yvn)
+  +yn*spin*(xv+yn*spin-xvn)
+  +xn*spin*(-yv+xn*spin+yvn)
+  +xvn*(-xv-yn*spin+xvn)
+  +yvn*(-yv+xn*spin+yvn)
+)
+dist^2=sum(n=1->w,
+  +xv*xv+xv*yn*spin-xv*xvn
+  +yv*yv-yv*xn*spin-yv*yvn
+  +yn*spin*xv+yn*spin*yn*spin-yn*spin*xvn
+  -xn*spin*yv+xn*spin*xn*spin+xn*spin*yvn
+  -xvn*xv-xvn*yn*spin+xvn*xvn
+  -yvn*yv+yvn*xn*spin+yvn*yvn
+)
+dist^2=sum(n=1->w,
+  +xv*xv
+  +yv*yv
+  -xv*xvn*2
+  -yv*yvn*2
+  +xvn*xvn
+  +yvn*yvn
+  +yn*xv*spin*2
+  -yv*xn*spin*2
+  +xn*xn*spin*spin
+  +yn*yn*spin*spin
+  +xn*spin*yvn*2
+  -yn*spin*xvn*2
+)
+
+// the minimum is where the derivatives with respect to all variables (xv, yv, and spin) are 0
+
+// take the derivative with respect to xv
+d/dxv*dist^2=sum(n=1->w,
+  +d/dxv*xv*xv
+  +d/dxv*yv*yv
+  -d/dxv*xv*xvn*2
+  -d/dxv*yv*yvn*2
+  +d/dxv*xvn*xvn
+  +d/dxv*yvn*yvn
+  +d/dxv*yn*xv*spin*2
+  -d/dxv*yv*xn*spin*2
+  +d/dxv*xn*xn*spin*spin
+  +d/dxv*yn*yn*spin*spin
+  +d/dxv*xn*spin*yvn*2
+  -d/dxv*yn*spin*xvn*2
 )
 d/dxv*dist^2=sum(n=1->w,
-+d/dxv*xv*xv
-+d/dxv*yv*yv
--d/dxv*xv*xvn*2
--d/dxv*yv*yvn*2
-+d/dxv*xvn*xvn
-+d/dxv*yvn*yvn
-+d/dxv*yn*xv*spin*2
--d/dxv*yv*xn*spin*2
-+d/dxv*xn*xn*spin*spin
-+d/dxv*yn*yn*spin*spin
-+d/dxv*xn*spin*yvn*2
--d/dxv*yn*spin*xvn*2
+  +d/dxv*xv*xv
+  -d/dxv*xv*xvn*2
+  +d/dxv*yn*xv*spin*2
 )
 d/dxv*dist^2=sum(n=1->w,
-+d/dxv*xv*xv
--d/dxv*xv*xvn*2
-+d/dxv*yn*xv*spin*2
+  +xv*2
+  -xvn*2
+  +yn*spin*2
 )
-d/dxv*dist^2=sum(n=1->w,
-+xv*2
--xvn*2
-+yn*spin*2
+
+// take the derivative with respect to yv
+d/dyv*dist^2=sum(n=1->w,
+  +d/dyv*xv*xv
+  +d/dyv*yv*yv
+  -d/dyv*xv*xvn*2
+  -d/dyv*yv*yvn*2
+  +d/dyv*xvn*xvn
+  +d/dyv*yvn*yvn
+  +d/dyv*yn*xv*spin*2
+  -d/dyv*yv*xn*spin*2
+  +d/dyv*xn*xn*spin*spin
+  +d/dyv*yn*yn*spin*spin
+  +d/dyv*xn*spin*yvn*2
+  -d/dyv*yn*spin*xvn*2
 )
 d/dyv*dist^2=sum(n=1->w,
-+d/dyv*xv*xv
-+d/dyv*yv*yv
--d/dyv*xv*xvn*2
--d/dyv*yv*yvn*2
-+d/dyv*xvn*xvn
-+d/dyv*yvn*yvn
-+d/dyv*yn*xv*spin*2
--d/dyv*yv*xn*spin*2
-+d/dyv*xn*xn*spin*spin
-+d/dyv*yn*yn*spin*spin
-+d/dyv*xn*spin*yvn*2
--d/dyv*yn*spin*xvn*2
+  +d/dyv*yv*yv
+  -d/dyv*yv*yvn*2
+  -d/dyv*yv*xn*spin*2
 )
 d/dyv*dist^2=sum(n=1->w,
-+d/dyv*yv*yv
--d/dyv*yv*yvn*2
--d/dyv*yv*xn*spin*2
+  +yv*2
+  -yvn*2
+  -xn*spin*2
 )
-d/dyv*dist^2=sum(n=1->w,
-+yv*2
--yvn*2
--xn*spin*2
+
+// take the derivative with respect to spin
+d/dspin*dist^2=sum(n=1->w,
+  +d/dspin*xv*xv
+  +d/dspin*yv*yv
+  -d/dspin*xv*xvn*2
+  -d/dspin*yv*yvn*2
+  +d/dspin*xvn*xvn
+  +d/dspin*yvn*yvn
+  +d/dspin*yn*xv*spin*2
+  -d/dspin*yv*xn*spin*2
+  +d/dspin*xn*xn*spin*spin
+  +d/dspin*yn*yn*spin*spin
+  +d/dspin*xn*spin*yvn*2
+  -d/dspin*yn*spin*xvn*2
 )
 d/dspin*dist^2=sum(n=1->w,
-+d/dspin*xv*xv
-+d/dspin*yv*yv
--d/dspin*xv*xvn*2
--d/dspin*yv*yvn*2
-+d/dspin*xvn*xvn
-+d/dspin*yvn*yvn
-+d/dspin*yn*xv*spin*2
--d/dspin*yv*xn*spin*2
-+d/dspin*xn*xn*spin*spin
-+d/dspin*yn*yn*spin*spin
-+d/dspin*xn*spin*yvn*2
--d/dspin*yn*spin*xvn*2
+  +d/dspin*yn*xv*spin*2
+  -d/dspin*yv*xn*spin*2
+  +d/dspin*xn*xn*spin*spin
+  +d/dspin*yn*yn*spin*spin
+  +d/dspin*xn*spin*yvn*2
+  -d/dspin*yn*spin*xvn*2
 )
 d/dspin*dist^2=sum(n=1->w,
-+d/dspin*yn*xv*spin*2
--d/dspin*yv*xn*spin*2
-+d/dspin*xn*xn*spin*spin
-+d/dspin*yn*yn*spin*spin
-+d/dspin*xn*spin*yvn*2
--d/dspin*yn*spin*xvn*2
+  +yn*xv*2
+  -yv*xn*2
+  +xn*xn*spin*2
+  +yn*yn*spin*2
+  +xn*yvn*2
+  -yn*xvn*2
 )
-d/dspin*dist^2=sum(n=1->w,
-+yn*xv*2
--yv*xn*2
-+xn*xn*spin*2
-+yn*yn*spin*2
-+xn*yvn*2
--yn*xvn*2
-)
+
+
 0=sum(n=1->w,
 +xv*2
 -xvn*2
