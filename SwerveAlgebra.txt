@@ -15,7 +15,7 @@ yvn=yv-xn*spin
 // this is the distance from the point in the velocity space for a value of xv, yv, and spin
 dist^2=sum(n=1->w,(xv+yn*spin-xvn)^2+(yv-xn*spin-yvn)^2)
 
-// the calculated control values (xv, yv, and spin) are the ones where the distance is minimum
+// the calculated control values (xv, yv, and spin) are the ones where the distance is minimized
 
 // expand all parentheses
 dist^2=sum(n=1->w,(xv+yn*spin-xvn)^2+(yv-xn*spin-yvn)^2)
@@ -67,6 +67,10 @@ dist^2=sum(n=1->w,
   +xn*spin*yvn*2
   -yn*spin*xvn*2
 )
+
+
+
+
 
 // the minimum is where the derivatives with respect to all variables (xv, yv, and spin) are 0
 
@@ -155,128 +159,261 @@ d/dspin*dist^2=sum(n=1->w,
 )
 
 
+
+
+// set the derivative with respect to xv to 0
 0=sum(n=1->w,
-+xv*2
--xvn*2
-+yn*spin*2
+  +xv*2
+  -xvn*2
+  +yn*spin*2
 )
+// split the sum
 0=
-+sum(n=1->w,xv*2)
--sum(n=1->w,xvn*2)
-+sum(n=1->w,yn*spin*2)
+  +sum(n=1->w,xv*2)
+  -sum(n=1->w,xvn*2)
+  +sum(n=1->w,yn*spin*2)
+// move non-(xn,yn,xvn,yvn) factors out of the sum
+0=
+  +sum(n=1->w,1)*xv*2
+  -sum(n=1->w,xvn)*2
+  +sum(n=1->w,yn)*spin*2
+// sum(n=1->w,1)=w
+0=
+  +w*xv*2
+  -sum(n=1->w,xvn)*2
+  +sum(n=1->w,yn)*spin*2
+// remove the factor of 2
+0=
+  +w*xv
+  -sum(n=1->w,xvn)
+  +sum(n=1->w,yn)*spin
+
+
+// set the derivative with respect to yv to 0
+0=sum(n=1->w,
+  +yv*2
+  -yvn*2
+  -xn*spin*2
+)
+// split the sum
+0=
+  +sum(n=1->w,yv*2)
+  -sum(n=1->w,yvn*2)
+  -sum(n=1->w,xn*spin*2)
+// move non-(xn,yn,xvn,yvn) factors out of the sum
+0=
+  +sum(n=1->w,1)*yv*2
+  -sum(n=1->w,yvn)*2
+  -sum(n=1->w,xn)*spin*2
+// sum(n=1->w,1)=w
+0=
+  +w*yv*2
+  -sum(n=1->w,yvn)*2
+  -sum(n=1->w,xn)*spin*2
+// remove the factor of 2
+0=
+  +w*yv
+  -sum(n=1->w,yvn)
+  -sum(n=1->w,xn)*spin
+
+
+// set the derivative with respect to spin to 0
+0=sum(n=1->w,
+  +yn*xv*2
+  -yv*xn*2
+  +xn*xn*spin*2
+  +yn*yn*spin*2
+  +xn*yvn*2
+  -yn*xvn*2
+)
+// split the sum
+0=
+  +sum(n=1->w,yn*xv*2)
+  -sum(n=1->w,yv*xn*2)
+  +sum(n=1->w,xn*xn*spin*2)
+  +sum(n=1->w,yn*yn*spin*2)
+  +sum(n=1->w,xn*yvn*2)
+  -sum(n=1->w,yn*xvn*2)
+// move non-(xn,yn,xvn,yvn) factors out of the sum
+0=
+  +sum(n=1->w,yn)*xv*2
+  -sum(n=1->w,xn)*yv*2
+  +sum(n=1->w,xn*xn)*spin*2
+  +sum(n=1->w,yn*yn)*spin*2
+  +sum(n=1->w,xn*yvn)*2
+  -sum(n=1->w,yn*xvn)*2
+// remove the factor of 2
+0=
+  +sum(n=1->w,yn)*xv
+  -sum(n=1->w,xn)*yv
+  +sum(n=1->w,xn*xn)*spin
+  +sum(n=1->w,yn*yn)*spin
+  +sum(n=1->w,xn*yvn)
+  -sum(n=1->w,yn*xvn)
+
+
+
+
+// the equations
 
 0=
-+sum(n=1->w,yv*2)
--sum(n=1->w,yvn*2)
--sum(n=1->w,xn*spin*2)
+  +w*xv
+  -sum(n=1->w,xvn)
+  +sum(n=1->w,yn)*spin
 
 0=
-+sum(n=1->w,yn*xv*2)
--sum(n=1->w,yv*xn*2)
-+sum(n=1->w,xn*xn*spin*2)
-+sum(n=1->w,yn*yn*spin*2)
-+sum(n=1->w,xn*yvn*2)
--sum(n=1->w,yn*xvn*2)
+  +w*yv
+  -sum(n=1->w,yvn)
+  -sum(n=1->w,xn)*spin
 
 0=
-+w*xv
--sum(n=1->w,xvn)
-+sum(n=1->w,yn)*spin
+  +sum(n=1->w,yn)*xv
+  -sum(n=1->w,xn)*yv
+  +sum(n=1->w,xn*xn)*spin
+  +sum(n=1->w,yn*yn)*spin
+  +sum(n=1->w,xn*yvn)
+  -sum(n=1->w,yn*xvn)
 
+
+
+
+
+// solve for xv
 0=
-+w*yv
--sum(n=1->w,yvn)
--sum(n=1->w,xn)*spin
-
+  +w*xv
+  -sum(n=1->w,xvn)
+  +sum(n=1->w,yn)*spin
+// flip signs
 0=
-+sum(n=1->w,yn)*xv
--sum(n=1->w,xn)*yv
-+sum(n=1->w,xn*xn)*spin
-+sum(n=1->w,yn*yn)*spin
-+sum(n=1->w,xn*yvn)
--sum(n=1->w,yn*xvn)
+  -w*xv
+  +sum(n=1->w,xvn)
+  -sum(n=1->w,yn)*spin
+// move xv to the other side
+w*xv=
+  +sum(n=1->w,xvn)
+  -sum(n=1->w,yn)*spin
+// divide by w
+xv=(
+  +sum(n=1->w,xvn)
+  -sum(n=1->w,yn)*spin
+)/w
+// sum/w = average
+xv=
+  +avg(n=1->w,xvn)
+  -avg(n=1->w,yn)*spin
 
-+w*xv=
-+sum(n=1->w,xvn)
--sum(n=1->w,yn)*spin
+// solve for yv
+0=
+  +w*yv
+  -sum(n=1->w,yvn)
+  -sum(n=1->w,xn)*spin
+// flip signs
+0=
+  -w*yv
+  +sum(n=1->w,yvn)
+  +sum(n=1->w,xn)*spin
+// move yv to the other side
+w*yv=
+  +sum(n=1->w,yvn)
+  +sum(n=1->w,xn)*spin
+// divide by w
+yv=(
+  +sum(n=1->w,yvn)
+  +sum(n=1->w,xn)*spin
+)/w
+// sum/w = average
+yv=
+  +avg(n=1->w,yvn)
+  +avg(n=1->w,xn)*spin
 
-+w*yv=
-+sum(n=1->w,yvn)
-+sum(n=1->w,xn)*spin
+// solve for spin
+0=
+  +sum(n=1->w,yn)*xv
+  -sum(n=1->w,xn)*yv
+  +sum(n=1->w,xn*xn)*spin
+  +sum(n=1->w,yn*yn)*spin
+  +sum(n=1->w,xn*yvn)
+  -sum(n=1->w,yn*xvn)
+// divide by w and sum/w = average
+0=
+  +avg(n=1->w,yn)*xv
+  -avg(n=1->w,xn)*yv
+  +avg(n=1->w,xn*xn)*spin
+  +avg(n=1->w,yn*yn)*spin
+  +avg(n=1->w,xn*yvn)
+  -avg(n=1->w,yn*xvn)
+// substitute xv and yv
+xv=avg(n=1->w,xvn)-avg(n=1->w,yn)*spin
+yv=avg(n=1->w,yvn)+avg(n=1->w,xn)*spin
+0=
+  +avg(n=1->w,yn)*(avg(n=1->w,xvn)-avg(n=1->w,yn)*spin)
+  -avg(n=1->w,xn)*(avg(n=1->w,yvn)+avg(n=1->w,xn)*spin)
+  +avg(n=1->w,xn*xn)*spin
+  +avg(n=1->w,yn*yn)*spin
+  +avg(n=1->w,xn*yvn)
+  -avg(n=1->w,yn*xvn)
+// expand parentheses
+0=
+  +avg(n=1->w,yn)*avg(n=1->w,xvn)
+  -avg(n=1->w,yn)*avg(n=1->w,yn)*spin
+  -avg(n=1->w,xn)*avg(n=1->w,yvn)
+  -avg(n=1->w,xn)*avg(n=1->w,xn)*spin
+  +avg(n=1->w,xn*xn)*spin
+  +avg(n=1->w,yn*yn)*spin
+  +avg(n=1->w,xn*yvn)
+  -avg(n=1->w,yn*xvn)
+// group spin terms
+0=
+  -avg(n=1->w,yn)*avg(n=1->w,yn)*spin
+  -avg(n=1->w,xn)*avg(n=1->w,xn)*spin
+  +avg(n=1->w,xn*xn)*spin
+  +avg(n=1->w,yn*yn)*spin
+  +avg(n=1->w,yn)*avg(n=1->w,xvn)
+  -avg(n=1->w,xn)*avg(n=1->w,yvn)
+  +avg(n=1->w,xn*yvn)
+  -avg(n=1->w,yn*xvn)
+// move spin to the other side
+  +avg(n=1->w,yn)*avg(n=1->w,yn)*spin
+  +avg(n=1->w,xn)*avg(n=1->w,xn)*spin
+  -avg(n=1->w,xn*xn)*spin
+  -avg(n=1->w,yn*yn)*spin
+=
+  +avg(n=1->w,yn)*avg(n=1->w,xvn)
+  -avg(n=1->w,xn)*avg(n=1->w,yvn)
+  +avg(n=1->w,xn*yvn)
+  -avg(n=1->w,yn*xvn)
+// isolate spin
+spin*(
+  +avg(n=1->w,yn)*avg(n=1->w,yn)
+  +avg(n=1->w,xn)*avg(n=1->w,xn)
+  -avg(n=1->w,xn*xn)
+  -avg(n=1->w,yn*yn)
+)
+=
+  +avg(n=1->w,yn)*avg(n=1->w,xvn)
+  -avg(n=1->w,xn)*avg(n=1->w,yvn)
+  +avg(n=1->w,xn*yvn)
+  -avg(n=1->w,yn*xvn)
+// divide
+spin=
+(
+  +avg(n=1->w,yn)*avg(n=1->w,xvn)
+  -avg(n=1->w,xn)*avg(n=1->w,yvn)
+  +avg(n=1->w,xn*yvn)
+  -avg(n=1->w,yn*xvn)
+)/(
+  +avg(n=1->w,yn)*avg(n=1->w,yn)
+  +avg(n=1->w,xn)*avg(n=1->w,xn)
+  -avg(n=1->w,xn*xn)
+  -avg(n=1->w,yn*yn)
+)
 
-+sum(n=1->w,yn*xvn)-sum(n=1->w,xn*yvn)=
-+(sum(n=1->w,xn*xn)+sum(n=1->w,yn*yn))*spin
-+sum(n=1->w,yn)*xv
--sum(n=1->w,xn)*yv
 
-+sum(n=1->w,yn*xvn)-sum(n=1->w,xn*yvn)=
-+(sum(n=1->w,xn*xn)+sum(n=1->w,yn*yn))*spin
-+sum(n=1->w,yn)*(+sum(n=1->w,xvn)-sum(n=1->w,yn)*spin)/w
--sum(n=1->w,xn)*(+sum(n=1->w,yvn)+sum(n=1->w,xn)*spin)/w
 
-+sum(n=1->w,yn*xvn)-sum(n=1->w,xn*yvn)=
-+(sum(n=1->w,xn*xn)+sum(n=1->w,yn*yn))*spin
-+sum(n=1->w,yn)*sum(n=1->w,xvn)/w
--sum(n=1->w,yn)*sum(n=1->w,yn)*spin/w
--sum(n=1->w,xn)*sum(n=1->w,yvn)/w
--sum(n=1->w,xn)*sum(n=1->w,xn)*spin/w
 
-+sum(n=1->w,yn*xvn)-sum(n=1->w,xn*yvn)=
-+(sum(n=1->w,xn*xn)+sum(n=1->w,yn*yn))*spin
-+sum(n=1->w,yn)*sum(n=1->w,xvn)/w
--sum(n=1->w,yn)*sum(n=1->w,yn)*spin/w
--sum(n=1->w,xn)*sum(n=1->w,yvn)/w
--sum(n=1->w,xn)*sum(n=1->w,xn)*spin/w
 
-+sum(n=1->w,yn*xvn)*w-sum(n=1->w,xn*yvn)*w=
-+(sum(n=1->w,xn*xn)*w+sum(n=1->w,yn*yn)*w)*spin
-+sum(n=1->w,yn)*sum(n=1->w,xvn)
--sum(n=1->w,yn)*sum(n=1->w,yn)*spin
--sum(n=1->w,xn)*sum(n=1->w,yvn)
--sum(n=1->w,xn)*sum(n=1->w,xn)*spin
 
-+sum(n=1->w,yn*xvn)*w-sum(n=1->w,xn*yvn)*w=
-+sum(n=1->w,xn*xn)*w*spin
-+sum(n=1->w,yn*yn)*w*spin
-+sum(n=1->w,yn)*sum(n=1->w,xvn)
--sum(n=1->w,yn)*sum(n=1->w,yn)*spin
--sum(n=1->w,xn)*sum(n=1->w,yvn)
--sum(n=1->w,xn)*sum(n=1->w,xn)*spin
 
-+sum(n=1->w,yn*xvn)*w
--sum(n=1->w,xn*yvn)*w=
-+sum(n=1->w,xn*xn)*w*spin
-+sum(n=1->w,yn*yn)*w*spin
--sum(n=1->w,yn)*sum(n=1->w,yn)*spin
--sum(n=1->w,xn)*sum(n=1->w,xn)*spin
-+sum(n=1->w,yn)*sum(n=1->w,xvn)
--sum(n=1->w,xn)*sum(n=1->w,yvn)
-
-+sum(n=1->w,yn*xvn)*w
--sum(n=1->w,xn*yvn)*w
--sum(n=1->w,yn)*sum(n=1->w,xvn)
-+sum(n=1->w,xn)*sum(n=1->w,yvn)=
-+sum(n=1->w,xn*xn)*w*spin
-+sum(n=1->w,yn*yn)*w*spin
--sum(n=1->w,yn)*sum(n=1->w,yn)*spin
--sum(n=1->w,xn)*sum(n=1->w,xn)*spin
-
-+w*xv=
-+sum(n=1->w,xvn)
--sum(n=1->w,yn)*spin
-
-+w*yv=
-+sum(n=1->w,yvn)
-+sum(n=1->w,xn)*spin
-
-+avg(n=1->w,yn*xvn)
--avg(n=1->w,xn*yvn)
--avg(n=1->w,yn)*avg(n=1->w,xvn)
-+avg(n=1->w,xn)*avg(n=1->w,yvn)=
-+avg(n=1->w,xn*xn)*spin
-+avg(n=1->w,yn*yn)*spin
--avg(n=1->w,yn)*avg(n=1->w,yn)*spin
--avg(n=1->w,xn)*avg(n=1->w,xn)*spin
 
 xvn=xv+yn*spin
 yvn=yv-xn*spin
