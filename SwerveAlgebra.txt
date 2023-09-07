@@ -413,31 +413,35 @@ spin=
 
 
 
+// the wheel angle can't change too fast, so calculate the maximum amount of change in xv, yv, or spin while keeping the angle change below the limit
 
-
+// the ideal values of xvn and yvn
 xvn=xv+yn*spin
 yvn=yv-xn*spin
 
 anglen=atan(xvn/yvn)
 anglen=atan((xv+yn*spin)/(yv-xn*spin))
 
+// take the derivative with respect to xv
 d/dxv*anglen=d/dxv*atan((xv+yn*spin)/(yv-xn*spin))
 d/dxv*anglen=(d/dxv*((xv+yn*spin)/(yv-xn*spin)))/(1+((xv+yn*spin)/(yv-xn*spin))^2)
 d/dxv*anglen=((d/dxv*(xv+yn*spin))*(yv-xn*spin)-(xv+yn*spin)*(d/dxv*(yv-xn*spin)))/((1+((xv+yn*spin)/(yv-xn*spin))^2)*((yv-xn*spin)^2))
-d/dxv*anglen=(yv-xn*spin)/((((yv-xn*spin)^2)+((xv+yn*spin)^2))
-d/dxv*anglen=(yv-xn*spin)/((((yv-xn*spin)^2)+((xv+yn*spin)^2))
+d/dxv*anglen=(yv-xn*spin)/(((yv-xn*spin)^2)+((xv+yn*spin)^2))
+d/dxv*anglen=(yv-xn*spin)/(((yv-xn*spin)^2)+((xv+yn*spin)^2))
 
+// take the derivative with respect to yv
 d/dyv*anglen=d/dyv*atan((xv+yn*spin)/(yv-xn*spin))
 d/dyv*anglen=(d/dyv*((xv+yn*spin)/(yv-xn*spin)))/(1+((xv+yn*spin)/(yv-xn*spin))^2)
 d/dyv*anglen=((d/dyv*(xv+yn*spin))*(yv-xn*spin)-(xv+yn*spin)*(d/dyv*(yv-xn*spin)))/((1+((xv+yn*spin)/(yv-xn*spin))^2)*((yv-xn*spin)^2))
-d/dyv*anglen=-(xv+yn*spin)/((((yv-xn*spin)^2)+((xv+yn*spin)^2))
-d/dyv*anglen=-(xv+yn*spin)/((((yv-xn*spin)^2)+((xv+yn*spin)^2))
+d/dyv*anglen=-(xv+yn*spin)/(((yv-xn*spin)^2)+((xv+yn*spin)^2))
+d/dyv*anglen=-(xv+yn*spin)/(((yv-xn*spin)^2)+((xv+yn*spin)^2))
 
+// take the derivative with respect to spin
 d/dspin*anglen=d/dspin*atan((xv+yn*spin)/(yv-xn*spin))
 d/dspin*anglen=(d/dspin*((xv+yn*spin)/(yv-xn*spin)))/(1+((xv+yn*spin)/(yv-xn*spin))^2)
 d/dspin*anglen=((d/dspin*(xv+yn*spin))*(yv-xn*spin)-(xv+yn*spin)*(d/dspin*(yv-xn*spin)))/((1+((xv+yn*spin)/(yv-xn*spin))^2)*((yv-xn*spin)^2))
-d/dspin*anglen=(yn*(yv-xn*spin)+(xv+yn*spin)*xn)/((((yv-xn*spin)^2)+((xv+yn*spin)^2))
-d/dspin*anglen=(yn*(yv-xn*spin)+(xv+yn*spin)*xn)/((((yv-xn*spin)^2)+((xv+yn*spin)^2))
+d/dspin*anglen=(yn*(yv-xn*spin)+(xv+yn*spin)*xn)/(((yv-xn*spin)^2)+((xv+yn*spin)^2))
+d/dspin*anglen=(yn*(yv-xn*spin)+(xv+yn*spin)*xn)/(((yv-xn*spin)^2)+((xv+yn*spin)^2))
 
 
 
