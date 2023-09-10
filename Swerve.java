@@ -1,39 +1,45 @@
 import edu.wpi.first.wpilibj.motorcontrol.MotorController;
 
-Robot.steeringratio // the proportion of the steering motor speed needed to keep the wheel not rolling
-Robot.turningmultiplier // the fraction of motor max speed which is the maximum turning speed of the wheel
-Robot.speedmultiplier // the fraction of motor max speed which is the maximum drive speed of the wheel
+//Robot.steeringratio // the proportion of the steering motor speed needed to keep the wheel not rolling
+//Robot.turningmultiplier // the fraction of motor max speed which is the maximum turning speed of the wheel
+//Robot.speedmultiplier // the fraction of motor max speed which is the maximum drive speed of the wheel
 
-
-/**
- * Calculate an angle from an x and y value.
- * <p>
- * Positive y is 0, and positive x is pi/2.
- * @return The angle in radians.
- */
-double Util.getAngle(double x,double y){
-  if(abs(x)>abs(y)){
-    return Math.PI/2-atan(y/x)-(x<0?Math.PI:0);
+class SwerveUtil {
+  public static final HALF_PI=Math.PI/2;
+  
+  /**
+   * Calculate an angle from an x and y value.
+   * <p>
+   * Positive y is 0, and positive x is pi/2.
+   * @return The angle in radians.
+   */
+  static double getAngle(double x,double y){
+    if(abs(x)>abs(y)){
+      return SwerveUtil.HALF_PI-atan(y/x)-(x<0?Math.PI:0);
+    }
+    return atan(x/y)+(y<0?Math.PI:0);
   }
-  return atan(x/y)+(y<0?Math.PI:0);
-} // +y is 0 +x is 1/2pi
-
-/**
- * Calculate the angle from b to a.
- * <p>
- * For the wheels.
- * Is mod pi.
- * @return The angle in radians.
- */
-double Util.angleDiff(double a,double b){
-  double diff=a-b;
-  if(diff>Util.HALF_PI){
-    diff-=Math.PI;
-  }else if(diff<-Util.HALF_PI){
-    diff+=Math.PI;
+  
+  /**
+   * Calculate the angle from b to a.
+   * <p>
+   * For the wheels.
+   * Is mod pi.
+   * The clockwise angle from b to a mod pi
+   * b and a are angles
+   * 
+   * @return The angle in radians between the lines with angles of b and a.
+   */
+  static double angleDiff(double a,double b){
+    double diff=a-b;
+    if(diff>SwerveUtil.HALF_PI){
+      diff-=Math.PI;
+    }else if(diff<-SwerveUtil.HALF_PI){
+      diff+=Math.PI;
+    }
+    return diff;
   }
-  return diff;
-} // the clockwise angle from b to a mod pi
+}
 
 /**
  * @author      Robert Vail <robert@robertvail.info>
@@ -183,13 +189,13 @@ class SwerveController{
       xvel=xv+spin*wheels[i].getY();
       yvel=yv-spin*wheels[i].getX();
       vel=Math.sqrt(xvel*xvel+yvel*yvel);
-      angle=Util.getAngle(xvel,yvel);
+      angle=SwerveUtil.getAngle(xvel,yvel);
       wheel.setSpeed(vel);
-      wheel.turn(Util.angleDiff(angle,wheel.getAngle()));
+      wheel.turn(SwerveUtil.angleDiff(angle,wheel.getAngle()));
     }
   }
   
-  class Wheel{
+  abstract class Wheel{
     /**
      * The x position of the wheel relative to the center of the robot. Positive values are towards the right.
      */
@@ -242,13 +248,13 @@ class SwerveController{
      * Can be mod 2pi.
      * @return The angle of this wheel relative to the front of the robot.
      */
-    public double getAngle();
+    abstract public double getAngle();
     
     /**
      * Get the speed this wheel is turning.
      * @return The speed this wheel is turning.
      */
-    public double getSpeed();
+    abstract public double getSpeed();
     
     /**
      * Set the turning speed.
